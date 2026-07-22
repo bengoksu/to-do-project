@@ -1,0 +1,302 @@
+/* Genel ayarlar */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+
+  background:
+    radial-gradient(circle at top left, #dbeafe, transparent 35%),
+    radial-gradient(circle at bottom right, #ede9fe, transparent 35%), #f8fafc;
+
+  color: #1e293b;
+}
+
+/* Ana alan */
+main.container {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* Ana kart */
+.card {
+  padding: 32px !important;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.1);
+
+  backdrop-filter: blur(14px);
+}
+
+/* Başlık */
+h1 {
+  margin-bottom: 28px !important;
+
+  font-size: 32px;
+  font-weight: 750;
+
+  color: #172554;
+
+  letter-spacing: -1px;
+}
+
+/* Input ve ekle butonu */
+.input-group {
+  padding: 6px;
+
+  background-color: #f1f5f9;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+
+/* Görev yazma alanı */
+#taskInput {
+  padding: 13px 16px;
+
+  background-color: transparent;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 15px;
+}
+
+#taskInput:focus {
+  background-color: white;
+
+  border: none;
+  box-shadow: none;
+}
+
+/* Ekle butonu */
+#taskForm .btn-primary {
+  padding: 10px 24px;
+
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+
+  border: none;
+  border-radius: 12px;
+
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+#taskForm .btn-primary:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+}
+
+/* Filtre butonlarının bulunduğu alan */
+.d-flex.gap-2.mb-3 {
+  padding: 5px;
+
+  background-color: #f1f5f9;
+
+  border-radius: 14px;
+}
+
+/* Filtre butonları */
+#showAllButton,
+#showActiveButton,
+#showCompletedButton {
+  flex: 1;
+
+  padding: 9px;
+
+  background-color: transparent;
+
+  color: #64748b;
+
+  border: none;
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+/* Seçili filtre butonları */
+#showAllButton.btn-primary,
+#showActiveButton.btn-primary,
+#showCompletedButton.btn-success {
+  background-color: white;
+
+  color: #4f46e5;
+
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+}
+
+/* Filtre butonlarına gelindiğinde */
+#showAllButton:hover,
+#showActiveButton:hover,
+#showCompletedButton:hover {
+  background-color: white;
+
+  color: #4f46e5;
+}
+
+/* Görev listesi */
+#taskList {
+  gap: 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Her görev */
+#taskList li {
+  padding: 14px 15px;
+
+  background-color: white;
+
+  border: 1px solid #e8edf3;
+  border-radius: 14px !important;
+
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+
+  transition: 0.2s;
+}
+
+/* Görev üzerine gelindiğinde */
+#taskList li:hover {
+  transform: translateY(-2px);
+
+  border-color: #c7d2fe;
+
+  box-shadow: 0 9px 22px rgba(15, 23, 42, 0.08);
+}
+
+/* Görev yazısı */
+#taskList span {
+  flex: 1;
+
+  padding-right: 15px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Tamamlanan görev */
+.completed {
+  color: #94a3b8;
+
+  text-decoration: line-through;
+
+  opacity: 0.7;
+}
+
+/* Sil butonu */
+#taskList .btn-danger {
+  padding: 7px 13px;
+
+  background-color: #fff1f2;
+
+  color: #e11d48;
+
+  border: none;
+  border-radius: 9px;
+
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+#taskList .btn-danger:hover {
+  background-color: #e11d48;
+
+  color: white;
+}
+
+/* Tüm görevleri sil butonu */
+#clearAllButton {
+  padding: 11px;
+
+  color: #e11d48;
+
+  background-color: transparent;
+
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+#clearAllButton:hover {
+  color: white;
+
+  background-color: #e11d48;
+
+  border-color: #e11d48;
+}
+
+/* Alt sayaç alanı */
+.card > .d-flex.justify-content-between:last-child {
+  padding: 15px 17px;
+
+  background-color: #f8fafc;
+
+  border-radius: 13px;
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+.card strong {
+  color: #4f46e5;
+
+  font-size: 16px;
+}
+
+/* Görev bulunamadı mesajı */
+#taskList .text-muted {
+  padding: 25px;
+
+  background-color: transparent;
+
+  border: 1px dashed #cbd5e1;
+
+  box-shadow: none;
+}
+
+/* Mobil görünüm */
+@media (max-width: 576px) {
+  main.container {
+    padding-top: 20px;
+  }
+
+  .card {
+    padding: 21px !important;
+
+    border-radius: 18px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  #taskForm .btn-primary {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .card > .d-flex.justify-content-between:last-child {
+    gap: 10px;
+
+    flex-direction: column;
+  }
+}
