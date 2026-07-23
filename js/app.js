@@ -1,6 +1,7 @@
 // HTML elemanlarını seçiyoruz.
 const taskForm = document.querySelector("#taskForm");
 const taskInput = document.querySelector("#taskInput");
+const taskButton = document.querySelector("#taskButton");
 const taskList = document.querySelector("#taskList");
 
 const totalTask = document.querySelector("#totalTask");
@@ -12,19 +13,23 @@ const showAllButton = document.querySelector("#showAllButton");
 const showActiveButton = document.querySelector("#showActiveButton");
 const showCompletedButton = document.querySelector("#showCompletedButton");
 
-// Tarayıcıda kayıtlı görevleri alıyoruz.
-// Kayıtlı görev yoksa boş bir dizi oluşturuyoruz.
+// LocalStorage'daki görevleri alıyoruz.
+// Kayıt yoksa boş bir dizi oluşturuyoruz.
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// Başlangıçta bütün görevleri gösteriyoruz.
+// Başlangıçta bütün görevler gösterilecek.
 let currentFilter = "all";
 
-// Görevleri localStorage içine kaydeder.
+// Düzenlenen görevin kimliğini burada tutacağız.
+// null olması, şu anda hiçbir görevin düzenlenmediği anlamına gelir.
+let editingTaskId = null;
+
+// Görevleri localStorage'a kaydeder.
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Toplam ve tamamlanan görev sayılarını günceller.
+// Sayaçları günceller.
 function updateCounters() {
   totalTask.textContent = tasks.length;
 
@@ -52,7 +57,7 @@ function getFilteredTasks() {
   return tasks;
 }
 
-// Aktif filtre butonunun görünümünü değiştirir.
+// Seçili filtre butonunun görünümünü değiştirir.
 function updateFilterButtons() {
   showAllButton.className = "btn btn-outline-primary btn-sm";
   showActiveButton.className = "btn btn-outline-primary btn-sm";
@@ -71,15 +76,22 @@ function updateFilterButtons() {
   }
 }
 
+// Düzenleme işlemini kapatır.
+function resetEditMode() {
+  editingTaskId = null;
+  taskInput.value = "";
+  taskButton.textContent = "Ekle";
+}
+
 // Görevleri ekranda gösterir.
 function renderTasks() {
-  // Önceden gösterilen görevleri temizler.
+  // Önceden ekranda bulunan görevleri temizler.
   taskList.innerHTML = "";
 
   // Seçilen filtreye uygun görevleri alır.
   const filteredTasks = getFilteredTasks();
 
-  // Görev bulunmuyorsa bilgi mesajı gösterir.
+  // Görev bulunmuyorsa mesaj gösterir.
   if (filteredTasks.length === 0) {
     const emptyMessage = document.createElement("li");
 
@@ -105,17 +117,35 @@ function renderTasks() {
     const taskSpan = document.createElement("span");
     taskSpan.textContent = task.text;
 
-    // Görev tamamlandıysa completed sınıfını ekler.
+    // Görev tamamlandıysa üzerini çizer.
     if (task.completed === true) {
       taskSpan.classList.add("completed");
     }
 
-    // Görev yazısına tıklanınca durumunu değiştirir.
+    // Görev yazısına tıklanınca tamamlanma durumunu değiştirir.
     taskSpan.addEventListener("click", function () {
       task.completed = !task.completed;
 
       saveTasks();
       renderTasks();
+    });
+
+    // Düzenle butonunu oluşturur.
+    const editButton = document.createElement("button");
+
+    editButton.textContent = "Düzenle";
+
+    editButton.classList.add("btn", "btn-warning", "btn-sm");
+
+    // Düzenle butonuna basıldığında görev yazısını input'a getirir.
+    editButton.addEventListener("click", function () {
+      taskInput.value = task.text;
+
+      editingTaskId = task.id;
+
+      taskButton.textContent = "Güncelle";
+
+      taskInput.focus();
     });
 
     // Sil butonunu oluşturur.
@@ -131,54 +161,77 @@ function renderTasks() {
         return item.id !== task.id;
       });
 
+      // Silinen görev düzenleniyorsa düzenleme modunu kapatır.
+      if (editingTaskId === task.id) {
+        resetEditMode();
+      }
+
       saveTasks();
       renderTasks();
     });
 
-    // Görev yazısını ve sil butonunu liste elemanına ekler.
-    newTask.appendChild(taskSpan);
-    newTask.appendChild(deleteButton);
+    // Butonları yan yana tutacak alanı oluşturur.
+    const buttonGroup = document.createElement("div");
 
-    // Liste elemanını görev listesine ekler.
+    buttonGroup.classList.add("d-flex", "gap-2");
+
+    buttonGroup.appendChild(editButton);
+    buttonGroup.appendChild(deleteButton);
+
+    // Görev yazısını ve butonları listeye ekler.
+    newTask.appendChild(taskSpan);
+    newTask.appendChild(buttonGroup);
+
     taskList.appendChild(newTask);
   });
 
   updateCounters();
 }
 
-// Form gönderildiğinde yeni görev ekler.
+// Form gönderildiğinde çalışır.
 taskForm.addEventListener("submit", function (event) {
   // Formun sayfayı yenilemesini engeller.
   event.preventDefault();
 
-  // Input içindeki yazıyı alır.
   const taskText = taskInput.value.trim();
 
-  // Boş görev eklenmesini engeller.
+  // Boş görev eklenmesini veya güncellenmesini engeller.
   if (taskText === "") {
     alert("Lütfen bir görev yazınız.");
     return;
   }
 
-  // Yeni görev nesnesi oluşturur.
-  const newTask = {
-    id: Date.now(),
-    text: taskText,
-    completed: false,
-  };
+  // Bir görev düzenleniyorsa mevcut görevi günceller.
+  if (editingTaskId !== null) {
+    const taskToUpdate = tasks.find(function (task) {
+      return task.id === editingTaskId;
+    });
 
-  // Yeni görevi görevler dizisine ekler.
-  tasks.push(newTask);
+    if (taskToUpdate !== undefined) {
+      taskToUpdate.text = taskText;
+    }
+
+    resetEditMode();
+  } else {
+    // Düzenleme yapılmıyorsa yeni görev oluşturur.
+    const newTask = {
+      id: Date.now(),
+      text: taskText,
+      completed: false,
+    };
+
+    tasks.push(newTask);
+
+    taskInput.value = "";
+  }
 
   saveTasks();
   renderTasks();
 
-  // Input alanını temizler.
-  taskInput.value = "";
   taskInput.focus();
 });
 
-// Tümü butonu
+// Tümü filtresi
 showAllButton.addEventListener("click", function () {
   currentFilter = "all";
 
@@ -186,7 +239,7 @@ showAllButton.addEventListener("click", function () {
   renderTasks();
 });
 
-// Yapılacak butonu
+// Yapılacak filtresi
 showActiveButton.addEventListener("click", function () {
   currentFilter = "active";
 
@@ -194,7 +247,7 @@ showActiveButton.addEventListener("click", function () {
   renderTasks();
 });
 
-// Tamamlanan butonu
+// Tamamlanan filtresi
 showCompletedButton.addEventListener("click", function () {
   currentFilter = "completed";
 
@@ -214,11 +267,12 @@ clearAllButton.addEventListener("click", function () {
   if (answer === true) {
     tasks = [];
 
+    resetEditMode();
     saveTasks();
     renderTasks();
   }
 });
 
-// Sayfa ilk açıldığında çalışır.
+// Sayfa açıldığında çalışır.
 updateFilterButtons();
 renderTasks();
